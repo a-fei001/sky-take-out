@@ -13,10 +13,10 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel(description = "员工登录返回的数据格式")
+@ApiModel(description = "员工登录返回的数据格式")//knife4j的注解 用来在接口文档中显示--Controller
 public class EmployeeLoginVO implements Serializable {
 
-    @ApiModelProperty("主键值")
+    @ApiModelProperty("主键值")//knife4j的注解 用来在接口文档中显示--属性值
     private Long id;
 
     @ApiModelProperty("用户名")
