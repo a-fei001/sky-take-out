@@ -37,6 +37,14 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .excludePathPatterns("/admin/employee/login");
     }
 
+    /*
+    * 通过knife4j实现swagger的作用，用来自动化接口测试
+    * 访问http://localhost:8080/doc.html进行测试
+    * knife4j是集成了swagger自动化测试功能的框架 使用：
+    * - 在pom.xml文件中引入
+    * - 下面docket方法
+    * - 下面addResourceHandlers方法(重写了父类WebMvcConfigurationSupport的方法)
+    * */
     /**
      * 通过knife4j生成接口文档
      * @return
@@ -58,9 +66,11 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     }
 
     /**
-     * 设置静态资源映射
+     * 设置静态资源映射--显示接口网页
      * @param registry
      */
+    //测试接口文档地址：http://localhost:8080/doc.html
+    @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");

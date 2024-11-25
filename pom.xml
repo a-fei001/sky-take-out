@@ -31,6 +31,11 @@
         <jaxb-api>2.3.1</jaxb-api>
         <poi>3.16</poi>
     </properties>
+
+
+    <!--
+    父项目中的 <dependencyManagement> 仅声明依赖版本，不会自动将这些依赖引入子模块。
+    子模块中需要显式声明使用这些依赖，而不需要再次指定版本号-->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -69,6 +74,7 @@
                 <version>${pagehelper}</version>
             </dependency>
 
+            <!--knife4j-继承了swagger自动化测试功能的框架-用来进行接口测试-->
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-spring-boot-starter</artifactId>
