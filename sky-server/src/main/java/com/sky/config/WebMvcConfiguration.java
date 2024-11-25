@@ -21,7 +21,11 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 @Slf4j
 public class WebMvcConfiguration extends WebMvcConfigurationSupport {
-
+/*
+* 继承 WebMvcConfigurationSupport 后，Spring 自动调用其中的钩子方法来完成拦截器和资源映射的注册。
+* 这些机制是 Spring 和 Spring Boot 的框架特性，无需显式调用方法
+* 这就是为什么没有在项目中调用 这些方法仍然起作用
+* */
     @Autowired
     private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
 
