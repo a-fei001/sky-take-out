@@ -3,6 +3,7 @@ package com.sky.service.impl;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
@@ -74,8 +75,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .status(StatusConstant.ENABLE)
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())
-                .createUser(10L)
-                .updateUser(10L)
+                //这个BaseContext里面的数据是在拦截器校验jwt时，解析出员工id后存入的
+                .createUser(BaseContext.getCurrentId())
+                .updateUser(BaseContext.getCurrentId())
                 .build();
         //对象属性拷贝--Spring框架自带的
         BeanUtils.copyProperties(employeeDTO, employee);

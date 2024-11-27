@@ -1,6 +1,7 @@
 package com.sky.interceptor;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
 import com.sky.properties.JwtProperties;
 import com.sky.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -48,6 +49,14 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
             log.info("当前员工id：", empId);
+
+            //新增用户时 需要填写用户的创建人id 最终修改人id
+            //这个id在生成JWT令牌时加入了 这里从令牌中解析出来
+            //BaseContext 使用ThreadLocal类 ThreadLocal为每个线程提供单独一份存储空间，具有线程隔离的效果，
+            //                             只有在线程内才能获取到对应的值，线程外则不能访问。
+            //逻辑：新增请求--*验证JWT--得到本次操作用户的id存入ThreadLocal*--在Service处存入
+            BaseContext.setCurrentId(empId);
+
             //3、通过，放行
             return true;
         } catch (Exception ex) {
