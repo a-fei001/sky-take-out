@@ -18,7 +18,6 @@ public interface EmployeeService {
     /**
      * 新增员工
      * @param employeeDTO
-     * @return
      */
     void save(EmployeeDTO employeeDTO);
 
@@ -35,7 +34,6 @@ public interface EmployeeService {
      *
      * @param status
      * @param id
-     * @return
      */
     void startOrStop(Integer status,Long id);
 
@@ -46,4 +44,11 @@ public interface EmployeeService {
      * @return
      */
     Employee selectById(Long id);
+
+    /**
+     * 编辑员工信息
+     *
+     * @param employeeDTO
+     */
+    void update(EmployeeDTO employeeDTO);
 }

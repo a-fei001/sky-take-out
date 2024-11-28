@@ -115,8 +115,10 @@ public class EmployeeController {
      */
     @ApiOperation("启用/禁用 员工账号")
     @PostMapping("/status/{status}")//注意这里的路径不能写错
+    //这里直接用Result 没有加类型是因为这里data为空 传给Result的类型是规定data的类型的
+    //data为空 传不传都可以
     public Result startOrStop(@PathVariable Integer status,Long id) {//spring内置自动类型转换
-        log.info("id: {} status: {}", id, status);
+        log.info("startOrStop id: {} status: {}", id, status);
         employeeService.startOrStop(status,id);
         return Result.success();
     }
@@ -130,10 +132,23 @@ public class EmployeeController {
     @ApiOperation("根据id查询员工信息")
     @GetMapping("/{id}")
     public Result<Employee> selectById(@PathVariable Long id) {
-        log.info("id: {}", id);
+        log.info("select id: {}", id);
         Employee employee = employeeService.selectById(id);
         return Result.success(employee);
     }
 
+    /**
+     * 编辑员工信息
+     *
+     * @param employeeDTO
+     * @return
+     */
+    @ApiOperation("编辑员工信息")
+    @PutMapping
+    public Result update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("update employeeDTO: {}", employeeDTO);
+        employeeService.update(employeeDTO);
+        return Result.success();
+    }
 
 }

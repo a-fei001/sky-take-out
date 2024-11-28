@@ -124,7 +124,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     /**
-     * 根据id查询员工信息
+     * 根据id查询员工信息.
      *
      * @param id
      * @return
@@ -135,6 +135,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         //隐藏密码，增加安全性
         employee.setPassword("*****");
         return employee;
+    }
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        //最终修改时间和最终修改人也改变了
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        //调用启用/禁用员工账号时的update方法
+        employeeMapper.update(employee);
     }
 
 
