@@ -38,4 +38,10 @@ public interface EmployeeMapper {
      */
     Page<Employee> pageQuery(String name);
 
+    /**
+     * 修改员工信息.
+     *
+     * @param employee
+     */
+    void update(Employee employee);
 }

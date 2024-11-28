@@ -106,5 +106,20 @@ public class EmployeeController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 启用/禁用 员工账号.
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @ApiOperation("启用/禁用 员工账号")
+    @PostMapping("/status/{status}")//注意这里的路径不能写错
+    public Result startOrStop(@PathVariable Integer status,Long id) {//spring内置自动类型转换
+        log.info("id: {} status: {}", id, status);
+        employeeService.startOrStop(status,id);
+        return Result.success();
+    }
+
 
 }

@@ -16,6 +16,8 @@ import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import java.time.LocalDateTime;
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
+    private static final Logger log = LoggerFactory.getLogger(EmployeeServiceImpl.class);
     @Autowired
     private EmployeeMapper employeeMapper;
 
@@ -102,6 +105,22 @@ public class EmployeeServiceImpl implements EmployeeService {
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO.getName());
         //page里面封装类total和员工集合(查询结果)，在这里封装到PageResult对象中
         return new PageResult(page.getTotal(),page.getResult());
+    }
+
+    /**
+     * 启用/禁用 员工账号.
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+        employeeMapper.update(employee);
     }
 
 }
