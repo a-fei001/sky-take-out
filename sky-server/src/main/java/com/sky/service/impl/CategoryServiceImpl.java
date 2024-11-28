@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -47,6 +48,25 @@ public class CategoryServiceImpl implements CategoryService {
                  .pageQuery(categoryPageQueryDTO.getName(), categoryPageQueryDTO.getType());
         return new PageResult(page.getTotal(),page.getResult());
     }
+
+    /**
+     * 启用/禁用 分类
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Category category = Category.builder()
+                .status(status)
+                .id(id)
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+        categoryMapper.updateCategory(category);
+    }
+
+
 }
 
 
