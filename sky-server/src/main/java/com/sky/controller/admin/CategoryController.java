@@ -61,6 +61,20 @@ public class CategoryController {
         categoryService.startOrStop(status,id);
         return Result.success();
     }
+
+    /**
+     * 新增分类.
+     *
+     * @param categoryDTO
+     * @return
+     */
+    @ApiOperation("新增分类")
+    @PostMapping
+    public Result<String> save(@RequestBody CategoryDTO categoryDTO){
+        log.info("save categoryDTO:{}", categoryDTO);
+        categoryService.save(categoryDTO);
+        return Result.success();
+    }
 }
 
 

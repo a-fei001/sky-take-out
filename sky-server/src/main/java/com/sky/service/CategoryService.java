@@ -29,4 +29,11 @@ public interface CategoryService {
      * @param id
      */
     void startOrStop(Integer status,Long id);
+
+    /**
+     * 新增分类.
+     *
+     * @param categoryDTO
+     */
+    void save(CategoryDTO categoryDTO);
 }

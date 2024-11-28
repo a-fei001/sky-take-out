@@ -2,6 +2,7 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
@@ -64,6 +65,24 @@ public class CategoryServiceImpl implements CategoryService {
                 .updateUser(BaseContext.getCurrentId())
                 .build();
         categoryMapper.updateCategory(category);
+    }
+
+    /**
+     * 新增分类.
+     *
+     * @param categoryDTO
+     */
+    @Override
+    public void save(CategoryDTO categoryDTO) {
+        Category category = Category.builder()
+                .status(StatusConstant.ENABLE)
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .createUser(BaseContext.getCurrentId())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+        BeanUtils.copyProperties(categoryDTO,category);
+        categoryMapper.save(category);
     }
 
 
