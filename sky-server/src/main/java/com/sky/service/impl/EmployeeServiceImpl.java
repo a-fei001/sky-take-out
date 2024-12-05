@@ -80,11 +80,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = Employee.builder()
                 .password(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()))
                 .status(StatusConstant.ENABLE)
-                .createTime(LocalDateTime.now())
-                .updateTime(LocalDateTime.now())
-                //这个BaseContext里面的数据是在拦截器校验jwt时，解析出员工id后存入的
-                .createUser(BaseContext.getCurrentId())
-                .updateUser(BaseContext.getCurrentId())
+                //update create的time userId的改变----通过AOP切面编程在AutoFillAspect中实现
+//                .createTime(LocalDateTime.now())
+//                .updateTime(LocalDateTime.now())
+//                .createUser(BaseContext.getCurrentId())
+//                .updateUser(BaseContext.getCurrentId())
                 .build();
         //对象属性拷贝--Spring框架自带的
         BeanUtils.copyProperties(employeeDTO, employee);
@@ -141,9 +141,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void update(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
-        //最终修改时间和最终修改人也改变了
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        //最终修改时间和最终修改人也改变了----通过AOP切面编程在AutoFillAspect中实现
+        //employee.setUpdateUser(BaseContext.getCurrentId());
+        //employee.setUpdateTime(LocalDateTime.now());
         //调用启用/禁用员工账号时的update方法
         employeeMapper.update(employee);
     }

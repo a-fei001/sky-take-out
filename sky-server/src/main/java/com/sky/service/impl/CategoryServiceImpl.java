@@ -40,8 +40,9 @@ public class CategoryServiceImpl implements CategoryService {
     public void updateCategory(CategoryDTO categoryDTO) {
         Category category = new Category();
         BeanUtils.copyProperties(categoryDTO,category);
-        category.setUpdateTime(LocalDateTime.now());
-        category.setUpdateUser(BaseContext.getCurrentId());
+        //update的time userId的改变----通过AOP切面编程在AutoFillAspect中实现
+        //category.setUpdateTime(LocalDateTime.now());
+        //category.setUpdateUser(BaseContext.getCurrentId());
         categoryMapper.updateCategory(category);
     }
 
@@ -85,10 +86,11 @@ public class CategoryServiceImpl implements CategoryService {
     public void save(CategoryDTO categoryDTO) {
         Category category = Category.builder()
                 .status(StatusConstant.ENABLE)
-                .createTime(LocalDateTime.now())
-                .updateTime(LocalDateTime.now())
-                .createUser(BaseContext.getCurrentId())
-                .updateUser(BaseContext.getCurrentId())
+                //update create的time userId的改变----通过AOP切面编程在AutoFillAspect中实现
+//                .createTime(LocalDateTime.now())
+//                .updateTime(LocalDateTime.now())
+//                .createUser(BaseContext.getCurrentId())
+//                .updateUser(BaseContext.getCurrentId())
                 .build();
         BeanUtils.copyProperties(categoryDTO,category);
         categoryMapper.save(category);
