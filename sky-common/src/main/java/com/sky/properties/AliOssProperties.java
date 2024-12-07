@@ -5,7 +5,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "sky.alioss")
+//注意 这个spring.alioss要和application.yml文件保持对应
+@ConfigurationProperties(prefix = "spring.alioss")
 @Data
 public class AliOssProperties {
 

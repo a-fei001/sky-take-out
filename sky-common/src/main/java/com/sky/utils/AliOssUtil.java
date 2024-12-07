@@ -52,12 +52,14 @@ public class AliOssUtil {
             }
         }
 
-        //文件访问路径规则 https://BucketName.Endpoint/ObjectName
+        //文件访问路径规则 https://BucketName.Endpoint(记得裁掉"https://")/ObjectName
+        //如果前端图片没有展示出来，可能是这里的路径错了
+        //这里的目的就是拼凑出阿里云图床的图片链接
         StringBuilder stringBuilder = new StringBuilder("https://");
         stringBuilder
                 .append(bucketName)
                 .append(".")
-                .append(endpoint)
+                .append(endpoint.split("//")[1])
                 .append("/")
                 .append(objectName);
 

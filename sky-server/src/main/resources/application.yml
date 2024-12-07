@@ -3,15 +3,29 @@ server:
 
 spring:
   profiles:
+    #表示引入外部的application-dev.yml文件 最重要的一句
+    #理论上这句必须 下面非必须
     active: dev
+  #表示可以允许 Bean 之间存在循环依赖
   main:
     allow-circular-references: true
+
+  #这里的druid:... alioss:... 不必要写在spring:层级下面
+  #这里写在这里只是因为老师给的代码database:放在这里了 顺手将alioss放这里 在一起便于管理
   datasource:
+    #druid 表示使用阿里巴巴的 Druid 数据库连接池。
+    #这里结构比xxx-dev.yml文件多了一个druid层级 但是spring可以自动识别
     druid:
       driver-class-name: ${sky.datasource.driver-class-name}
       url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: ${sky.datasource.username}
       password: ${sky.datasource.password}
+  #注意：@ConfigurationProperties(prefix = "spring.alioss")
+  alioss:
+    endpoint: ${sky.alioss.endpoint}
+    accessKeyId: ${sky.alioss.accessKeyId}
+    accessKeySecret: ${sky.alioss.accessKeySecret}
+    bucketName: ${sky.alioss.bucketName}
 
 mybatis:
   #mapper配置文件
@@ -38,3 +52,22 @@ sky:
     admin-ttl: 72000000000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
