@@ -12,4 +12,23 @@
              #{createTime}, #{updateTime}, #{createUser}, #{updateUser});
     </insert>
 
+    <!--连接查询外连接中 左外连接查询的sql语句-->
+    <!--注意这里as categoryName必须写 因为两个表的name都被查询到了 且名字相同
+        将后面的c.name改为categoryName 和DishVO中对应属性名相同 避免mybatis底层产生冲突-->
+    <select id="pageQuery" resultType="com.sky.vo.DishVO">
+        select  d.*,c.name as categoryName from dish d left join category c on d.category_id = c.id
+        <where>
+            <if test="name!=null and name!=''">
+                d.name like concat('%',#{name},'%')
+            </if>
+            <if test="categoryId!=null">
+                and d.category_id = #{categoryId}
+            </if>
+            <if test="status!=null">
+                and d.status = #{status}
+            </if>
+        </where>
+        order by d.create_time desc
+    </select>
+
 </mapper>

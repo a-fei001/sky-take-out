@@ -1,11 +1,18 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.dto.DishDTO;
+import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.result.PageResult;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +22,7 @@ import java.util.List;
 
 @Service
 public class DishServiceImpl implements DishService {
+    private static final Logger log = LoggerFactory.getLogger(DishServiceImpl.class);
     @Autowired
     private DishMapper dishMapper;
     @Autowired
@@ -40,6 +48,17 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.saveBatch(flavors);
         }
     }
+
+    @Override
+    public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
+        PageHelper.startPage(dishPageQueryDTO.getPage(),dishPageQueryDTO.getPageSize());
+        //这里DishVO的属性和sql查询的属性不完全一致 二者存在交集
+        //mybatis底层自动将交集部分数据接收完成，sql多出来的属性无法被接收，DishVO多出来的属性没有数据接收，值为null
+        Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
+        return new PageResult(page.getTotal(),page.getResult());
+    }
+
+
 }
 
 
