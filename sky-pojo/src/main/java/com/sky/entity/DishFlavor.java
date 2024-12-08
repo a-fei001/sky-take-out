@@ -16,6 +16,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DishFlavor implements Serializable {
 
+    //不清除加这个Serializable有什么用 不加代码也正常跑起来了
     private static final long serialVersionUID = 1L;
 
     private Long id;
