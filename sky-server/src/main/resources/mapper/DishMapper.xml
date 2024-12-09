@@ -31,4 +31,21 @@
         order by d.create_time desc
     </select>
 
+    <select id="selectBatchById" resultType="com.sky.entity.Dish">
+        select * from dish
+        <where>
+            id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
+    <delete id="deleteBatch">
+        delete from dish
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

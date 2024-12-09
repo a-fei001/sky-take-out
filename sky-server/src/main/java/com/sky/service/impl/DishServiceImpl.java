@@ -2,12 +2,17 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.SetmealDish;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -27,6 +32,8 @@ public class DishServiceImpl implements DishService {
     private DishMapper dishMapper;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
 
     @Override
     //方法涉及到两个数据库的操作，开启事务（使用这个注解需要在启动类上加上@EnableTransactionManagement）
@@ -56,6 +63,29 @@ public class DishServiceImpl implements DishService {
         //mybatis底层自动将交集部分数据接收完成，sql多出来的属性无法被接收，DishVO多出来的属性没有数据接收，值为null
         Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
         return new PageResult(page.getTotal(),page.getResult());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(List<Long> ids) {
+        //1.status状态正在出售不能删
+        List<Dish> dishs = dishMapper.selectBatchById(ids);
+        for (Dish dish : dishs) {
+            if(dish.getStatus().equals(StatusConstant.ENABLE)){
+                //抛出自定义异常 无法删除
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+        //2.setmeal_dish关联不能删
+        Integer num = setmealDishMapper.selectCountBachByDishId(ids);
+        if(num != null && num > 0){
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+        //3.删除dish表的数据
+        dishMapper.deleteBatch(ids);
+
+        //4.删除dish_flavor中关联的数据
+        dishFlavorMapper.deleteBatchByDishId(ids);
     }
 
 
