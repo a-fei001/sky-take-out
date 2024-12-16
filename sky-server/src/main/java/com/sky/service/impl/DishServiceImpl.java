@@ -83,7 +83,7 @@ public class DishServiceImpl implements DishService {
             }
         }
         //2.setmeal_dish关联不能删
-        Integer num = setmealDishMapper.selectCountBachByDishId(ids);
+        Integer num = setmealDishMapper.selectCountBatchByDishId(ids);
         if(num != null && num > 0){
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }

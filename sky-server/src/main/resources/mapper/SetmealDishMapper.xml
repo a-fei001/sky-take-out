@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.SetmealDishMapper">
-    <select id="selectCountBachByDishId" resultType="java.lang.Integer">
+    <select id="selectCountBatchByDishId" resultType="java.lang.Integer">
         select count(*) from sky_take_out.setmeal_dish
         <where>
             dish_id in
