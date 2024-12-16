@@ -29,4 +29,8 @@ public interface CategoryMapper {
 
     @Select("select * from sky_take_out.category where type = #{type}")
     List<Category> selectByType(Integer type);
+
+//    修改菜品-根据id查询菜品-DishServiceImpl-selectById 使用到了 测试发现 这个其实是多余的
+//    @Select(("select name from sky_take_out.category where id = #{categoryId}"))
+//    String selectNameById(Long categoryId);
 }

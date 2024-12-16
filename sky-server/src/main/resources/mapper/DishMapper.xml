@@ -48,4 +48,45 @@
             #{id}
         </foreach>
     </delete>
+
+    <select id="selectBatchByCategoryId" resultType="com.sky.entity.Dish">
+        select * from dish
+        <where>
+            category_id in
+            <foreach collection="cIds" item="cId" open="(" close=")" separator=",">
+                #{cId}
+            </foreach>
+        </where>
+    </select>
+
+    <update id="update">
+            UPDATE dish
+      <set>
+        <if test="categoryId!= null">
+            category_id = #{categoryId},
+        </if>
+        <if test="description!= null">
+            description = #{description},
+        </if>
+        <if test="image!= null">
+            image = #{image},
+        </if>
+        <if test="price!= null">
+            price = #{price},
+        </if>
+        <if test="status!= null">
+            status = #{status},
+        </if>
+        <if test="name!=null">
+            name = #{name},
+        </if>
+        <if test="updateTime!=null">
+          update_time = #{updateTime},
+        </if>
+        <if test="updateUser!=null">
+            update_user = #{updateUser},
+        </if>
+     </set>
+            WHERE id = #{id}
+    </update>
 </mapper>

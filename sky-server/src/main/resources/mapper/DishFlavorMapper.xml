@@ -16,4 +16,32 @@
             #{dishId}
         </foreach>
     </delete>
+
+    <!--sql语句大概是这个样子：
+    update dish_flavor set
+    dishId = 1, name = '香辣味', value = '很辣很过瘾',
+    dishId = 2, name = '糖醋味', value = '酸甜可口',
+    dishId = 1, name = '麻婆味', value = '麻辣鲜香'
+    where (id = 101 OR id = 102 OR id = 103)-->
+    <update id="batchUpdate">
+        update dish_flavor
+        <set>
+            <if test="flavors!= null and flavors.size > 0">
+                <foreach collection="flavors" item="flavor" separator=",">
+                    <if test="flavor.dishId!=null">
+                        dish_id = #{flavor.dishId},
+                    </if>
+                    <if test="flavor.name!= null">
+                        name = #{flavor.name},
+                    </if>
+                    <if test="flavor.value!= null">
+                        value = #{flavor.value}
+                    </if>
+                </foreach>
+            </if>
+        </set>
+        WHERE <foreach collection="flavors" item="flavor" open="(" close=")" separator=" OR ">
+        id = #{flavor.id}
+    </foreach>
+    </update>
 </mapper>

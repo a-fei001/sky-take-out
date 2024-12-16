@@ -4,12 +4,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.CategoryMapper;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
@@ -23,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,6 +38,8 @@ public class DishServiceImpl implements DishService {
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     @Override
     //方法涉及到两个数据库的操作，开启事务（使用这个注解需要在启动类上加上@EnableTransactionManagement）
@@ -88,7 +94,51 @@ public class DishServiceImpl implements DishService {
         dishFlavorMapper.deleteBatchByDishId(ids);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public DishVO selectById(Long id) {
+        DishVO dishVO = dishMapper.selectById(id);
+//        这里查询这个是因为DishVO里面包含这个属性 但是这个接口虽然使用DishVO传输数据
+//        却并不需要这个属性 所以这个是多余的
+//        //根据categoryId查询categoryName
+//        Long categoryId = dishVO.getCategoryId();
+//        dishVO.setCategoryName(categoryMapper.selectNameById(categoryId));
+        //根据id(dishId)查询flavors集合
+        List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDIshId(id);
+        dishVO.setFlavors(dishFlavors);
+        return dishVO;
+    }
 
+    @Override
+    public void updateStatus(Integer status, Integer id) {
+        LocalDateTime updateTime = LocalDateTime.now();
+        Long updateUser = BaseContext.getCurrentId();
+        dishMapper.updateStatus(status,id,updateUser,updateTime);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(DishDTO dishDTO) {
+        //修改dish
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+        dishMapper.update(dish);
+        //修改flavor-->删除原有的-->插入新的
+        //删掉原有的--调用以前写过的deleteBatchByDishId方法
+        ArrayList<Long> ids = new ArrayList<>();
+        ids.add(dish.getId());
+        dishFlavorMapper.deleteBatchByDishId(ids);
+        //插入新的口味数据
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        //直接复制粘贴新增菜品位置的代码即可
+        if (flavors != null && !flavors.isEmpty()) {
+            for (DishFlavor f : flavors) {
+                //经过DishMapper.xml中的<insert>上的配置 才能传来id值
+                f.setDishId(dish.getId());
+            }
+            dishFlavorMapper.saveBatch(flavors);
+        }
+    }
 }
 
 
