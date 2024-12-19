@@ -12,4 +12,6 @@ public interface SetmealDishMapper {
 
     @Select("select * from sky_take_out.setmeal_dish where setmeal_id=#{setmealId}")
     List<SetmealDish> selectBatchesBySetmealId(Long setmealId);
+
+    void insertBatch(List<SetmealDish> setmealDishes);
 }

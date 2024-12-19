@@ -45,4 +45,7 @@ public interface DishMapper {
     //你是不是应该用Dish封装一下？
     @AutoFill(OperationType.UPDATE)
     void update(Dish dish);
+
+    @Select("select * from sky_take_out.dish where category_id = #{categoryId}")
+    List<Dish> selectByCategoryId(Long categoryId);
 }
