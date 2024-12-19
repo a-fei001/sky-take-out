@@ -4,13 +4,17 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.enumeration.OperationType;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.exception.IdsIsNullOrIsEmpty;
+import com.sky.exception.SetmealEnableFailedException;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
@@ -33,6 +37,8 @@ public class SetmealServiceImpl implements SetmealService {
     private SetmealMapper setmealMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private DishMapper dishMapper;
 
     @Override
     public PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO) {
@@ -104,5 +110,23 @@ public class SetmealServiceImpl implements SetmealService {
             setmealDish.setSetmealId(setmeal.getId());
         }
         setmealDishMapper.insertBatch(setmealDishes);
+    }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        //如果是起售，起售前，判断起售的套餐中包含的菜品是否有停售的 有的话套餐不能起售
+        if (status.equals(StatusConstant.ENABLE)) {
+            List<Dish> dishes = dishMapper.selectBySetmealId(id);
+            for (Dish dish : dishes) {
+                if (dish.getStatus().equals(0)) {
+                    throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                }
+            }
+        }
+        Setmeal setmeal = Setmeal.builder()
+                .status(status)
+                .id(id)
+                .build();
+        setmealMapper.update(setmeal);
     }
 }

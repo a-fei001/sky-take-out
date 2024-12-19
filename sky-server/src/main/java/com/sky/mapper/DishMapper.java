@@ -48,4 +48,7 @@ public interface DishMapper {
 
     @Select("select * from sky_take_out.dish where category_id = #{categoryId}")
     List<Dish> selectByCategoryId(Long categoryId);
+
+    @Select("select a.* from dish a,setmeal_dish b where a.id = b.dish_id && b.setmeal_id = #{setmealId}")
+    List<Dish> selectBySetmealId(Long setmealId);
 }
