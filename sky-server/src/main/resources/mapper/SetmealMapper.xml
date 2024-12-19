@@ -27,4 +27,14 @@
             (#{categoryId}, #{name}, #{price}, #{description}, #{status},
              #{image}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
     </insert>
+
+    <delete id="deleteBatch">
+        delete from sky_take_out.setmeal
+        <where>
+            id in
+               <foreach collection="ids" item="id" separator="," open="(" close=")">
+                   #{id}
+               </foreach>
+        </where>
+    </delete>
 </mapper>

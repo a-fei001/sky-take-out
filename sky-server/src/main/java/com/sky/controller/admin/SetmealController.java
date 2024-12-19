@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @Api(tags =  "套餐相关接口")
@@ -41,6 +43,14 @@ public class SetmealController {
     public Result insert(@RequestBody SetmealDTO setmealDTO){
         log.info("新增套餐: {}",setmealDTO);
         setmealService.insert(setmealDTO);
+        return Result.success();
+    }
+
+    @ApiOperation("批量删除套餐")
+    @DeleteMapping
+    public Result deleteBatch(@RequestParam List<Long> ids){
+        log.info("批量删除套餐: {}",ids);
+        setmealService.deleteBatch(ids);
         return Result.success();
     }
 }
