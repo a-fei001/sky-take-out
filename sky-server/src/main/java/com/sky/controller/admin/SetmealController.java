@@ -53,4 +53,12 @@ public class SetmealController {
         setmealService.deleteBatch(ids);
         return Result.success();
     }
+
+    @ApiOperation("修改套餐")
+    @PutMapping
+    public Result update(@RequestBody SetmealDTO setmealDTO){
+        log.info("修改套餐: {}",setmealDTO);
+        setmealService.update(setmealDTO);
+        return Result.success();
+    }
 }

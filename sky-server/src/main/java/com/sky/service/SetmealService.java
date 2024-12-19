@@ -16,4 +16,6 @@ public interface SetmealService {
     void insert(SetmealDTO setmealDTO);
 
     void deleteBatch(List<Long> ids);
+
+    void update(SetmealDTO setmealDTO);
 }

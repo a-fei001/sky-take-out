@@ -28,4 +28,7 @@ public interface SetmealMapper {
     void insert(Setmeal setmeal);
 
     void deleteBatch(List<Long> ids);
+
+    @AutoFill(OperationType.UPDATE)
+    void update(Setmeal setmeal);
 }
