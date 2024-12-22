@@ -26,6 +26,11 @@ spring:
     accessKeyId: ${sky.alioss.accessKeyId}
     accessKeySecret: ${sky.alioss.accessKeySecret}
     bucketName: ${sky.alioss.bucketName}
+  redis:
+    host: ${sky.redis.host}
+    port: ${sky.redis.port}
+    password: ${sky.redis.password}
+    database: ${sky.redis.database}
 
 mybatis:
   #mapper配置文件

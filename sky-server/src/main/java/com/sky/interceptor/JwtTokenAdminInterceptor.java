@@ -48,7 +48,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             //JwtUtil.parseJWT(,请求头携带的token)
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
-            log.info("当前员工id：", empId);
+            log.info("当前员工id：{}", empId);
 
             //新增用户时 需要填写用户的创建人id 最终修改人id
             //这个id在生成JWT令牌时加入了 这里从令牌中解析出来
