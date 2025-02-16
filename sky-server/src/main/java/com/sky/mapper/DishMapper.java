@@ -51,4 +51,6 @@ public interface DishMapper {
 
     @Select("select a.* from dish a,setmeal_dish b where a.id = b.dish_id && b.setmeal_id = #{setmealId}")
     List<Dish> selectBySetmealId(Long setmealId);
+
+    List<Dish> list(Dish dish);
 }

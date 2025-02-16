@@ -145,24 +145,24 @@ public class DishServiceImpl implements DishService {
         return dishMapper.selectByCategoryId(categoryId);
     }
 
-//    /**
-//     * 条件查询菜品和口味
-//     * @param dish
-//     * @return
-//     */
-//    public List<DishVO> listWithFlavor(Dish dish) {
-//        List<Dish> dishList = dishMapper.list(dish);
-//        List<DishVO> dishVOList = new ArrayList<>();
-//        for (Dish d : dishList) {
-//            DishVO dishVO = new DishVO();
-//            BeanUtils.copyProperties(d,dishVO);
-//            //根据菜品id查询对应的口味
-//            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
-//            dishVO.setFlavors(flavors);
-//            dishVOList.add(dishVO);
-//        }
-//        return dishVOList;
-//    }
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.list(dish);//写1个list方法
+        List<DishVO> dishVOList = new ArrayList<>();
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.selectByDIshId(d.getId());
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+        return dishVOList;
+    }
 }
 
 
