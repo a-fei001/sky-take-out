@@ -27,7 +27,8 @@ public interface CategoryMapper {
     @Delete("DELETE FROM sky_take_out.category WHERE id = #{id}")
     void delete(Long id);
 
-    @Select("select * from sky_take_out.category where type = #{type}")
+    //修改成动态sql是因为要使用if标签来实现：不传递type的值时，查询所有分类
+    //@Select("select * from sky_take_out.category where type = #{type}")
     List<Category> selectByType(Integer type);
 
 //    修改菜品-根据id查询菜品-DishServiceImpl-selectById 使用到了 测试发现 这个其实是多余的
