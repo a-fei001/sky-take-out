@@ -17,7 +17,7 @@ import java.util.List;
 public interface SetmealMapper {
 
     @Select("select count(id) from setmeal where category_id = #{categoryId}")
-    Integer countByCategoryId(Long id);
+    Integer countByCategoryId(Long categoryId);
 
     Page<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 

@@ -14,6 +14,8 @@ public class JwtProperties {
      */
     private String adminSecretKey;
     private long adminTtl;
+//    前端传递令牌时，需要将 JWT 令牌放在 HTTP 请求头中，而具体放在哪个头字段需要前后端约定。
+//    admin-token-name 的作用就是告诉后端："前端会将 JWT 令牌放在名为 token 的请求头中"
     private String adminTokenName;
 
     /**
