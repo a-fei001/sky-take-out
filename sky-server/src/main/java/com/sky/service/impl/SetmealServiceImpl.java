@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +59,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = "setmealCache",key = "#setmealDTO.categoryId")//清理缓存
     public void insert(SetmealDTO setmealDTO) {
         //setmeal库的插入
         Setmeal setmeal = new Setmeal();
@@ -74,6 +76,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = "setmealCache",allEntries = true) //清理缓存
     public void deleteBatch(List<Long> ids) {
         if(ids == null || ids.isEmpty()){
             throw new IdsIsNullOrIsEmpty("请选择要删除的套餐");
@@ -93,6 +96,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = "setmealCache",allEntries = true) //清理缓存
     public void update(SetmealDTO setmealDTO) {
         //修改setmeal
         Setmeal setmeal = new Setmeal();
@@ -114,6 +118,7 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "setmealCache",allEntries = true) //清理缓存
     public void startOrStop(Integer status, Long id) {
         //如果是起售，起售前，判断起售的套餐中包含的菜品是否有停售的 有的话套餐不能起售
         if (status.equals(StatusConstant.ENABLE)) {
