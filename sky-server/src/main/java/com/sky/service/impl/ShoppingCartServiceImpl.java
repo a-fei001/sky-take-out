@@ -66,4 +66,31 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 .build();
         return shoppingCartMapper.list(shoppingCart);
     }
+
+    @Override
+    public void cleanShoppingCart() {
+        shoppingCartMapper.deleteByUserId(BaseContext.getCurrentId());
+    }
+
+    @Override
+    public void cleanOne(ShoppingCartDTO shoppingCartDTO) {
+        Long userId = BaseContext.getCurrentId();
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUserId(userId);
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+
+        //查找是否有这个商品
+        List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
+        if (list != null && list.size() > 0) {
+            ShoppingCart shoppingCart1 = list.get(0);
+            Integer number = shoppingCart1.getNumber();
+            if (number == 1) {
+                shoppingCartMapper.deleteById(shoppingCart1.getId());
+            } else{
+                shoppingCart1.setNumber(shoppingCart1.getNumber() - 1);
+                shoppingCartMapper.updateNumberById(shoppingCart1);
+            }
+        }
+        //这里因为是前端传来的购物车商品数据 基本不存在查不到的情况 所以默认一定有商品
+    }
 }
