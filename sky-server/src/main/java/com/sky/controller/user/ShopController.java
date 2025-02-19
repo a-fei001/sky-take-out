@@ -9,11 +9,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
-//区分两个相同的ShopController文件名
 @RestController("userShopController")
 @Slf4j
 @Api(tags =  "店铺相关接口")
-@RequestMapping("user/shop")
+@RequestMapping("/user/shop")
 public class ShopController {
     public final static String KEY = "SHOP_STATUS";
 
