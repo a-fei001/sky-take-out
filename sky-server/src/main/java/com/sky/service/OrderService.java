@@ -48,4 +48,11 @@ public interface OrderService {
      * @param id
      */
     void repetition(Long id);
+
+    /**
+     * 管理端订单搜索
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    PageResult adminSelect(OrdersPageQueryDTO ordersPageQueryDTO);
 }

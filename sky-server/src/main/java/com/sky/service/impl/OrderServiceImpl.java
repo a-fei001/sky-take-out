@@ -14,9 +14,7 @@ import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
-import com.sky.vo.OrderPaymentVO;
-import com.sky.vo.OrderSubmitVO;
-import com.sky.vo.OrderVO;
+import com.sky.vo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -45,6 +43,10 @@ public class OrderServiceImpl implements OrderService {
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private DishMapper dishMapper;
+    @Autowired
+    private SetmealMapper setmealMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -71,6 +73,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setPayStatus(Orders.UN_PAID);
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
+        orders.setAddress(addressBook.getDetail());
         orders.setNumber(String.valueOf(System.currentTimeMillis()));
         orderMapper.insert(orders);
         //3.order_detail表的插入操作
@@ -218,6 +221,45 @@ public class OrderServiceImpl implements OrderService {
             return shoppingCart;
         }).collect(Collectors.toList());
         shoppingCartMapper.insertBatch(list);
+    }
+
+    /**
+     * 管理端订单搜索
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    @Override
+    public PageResult adminSelect(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(),ordersPageQueryDTO.getPageSize());
+        Page<Orders> page = orderMapper.pageQueryOrdersByUserId(ordersPageQueryDTO);
+        List<OrderVO> list = new ArrayList<>();
+        for (Orders order : page) {
+            OrderVO orderVO = new OrderVO();
+            BeanUtils.copyProperties(order, orderVO);
+
+            List<OrderDetail> orderDetails = orderDetailMapper.getBatchByOrderId(order.getId());
+            StringBuilder orderDishes = new StringBuilder();
+            for (OrderDetail orderDetail : orderDetails) {
+                if(orderDetail.getDishId() != null){
+                    Long dishId = orderDetail.getDishId();
+                    Integer number = orderDetail.getNumber();
+                    DishVO dishVO = dishMapper.selectById(dishId);
+                    String name = dishVO.getName();
+                    orderDishes.append(name).append("* ").append(number).append("; ");
+                }
+                if(orderDetail.getSetmealId() != null){
+                    Long setmealId = orderDetail.getSetmealId();
+                    Integer number = orderDetail.getNumber();
+                    SetmealVO setmealVO = setmealMapper.selectSetmealById(setmealId);
+                    String name = setmealVO.getName();
+                    orderDishes.append(name).append("* ").append(number).append("; ");
+                }
+            }
+            String od = orderDishes.toString();
+            orderVO.setOrderDishes(od);
+            list.add(orderVO);
+        }
+        return new PageResult(page.getTotal(),list);
     }
 
 
