@@ -1,7 +1,10 @@
 package com.sky.controller.user;
 
+import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
@@ -20,6 +23,11 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+    /**
+     * 添加订单
+     * @param ordersSubmitDTO
+     * @return
+     */
     @ApiOperation("用户下单")
     @PostMapping("/submit")
     public Result<OrderSubmitVO> submit(@RequestBody OrdersSubmitDTO ordersSubmitDTO) {
@@ -41,4 +49,34 @@ public class OrderController {
         log.info("生成预支付交易单：{}", orderPaymentVO);
         return Result.success(orderPaymentVO);
     }
+
+    /**
+     * 历史订单查询
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    @GetMapping("/historyOrders")
+    @ApiOperation("历史订单查询")
+    public Result<PageResult> selectHistoryOrders(OrdersPageQueryDTO ordersPageQueryDTO) {
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        PageResult pageResult = orderService.selectHistoryOrders(ordersPageQueryDTO);
+        return Result.success(pageResult);
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
