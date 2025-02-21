@@ -320,7 +320,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 取消订单
+     * 拒单
      * @param orders
      * @throws Exception
      */
@@ -328,6 +328,9 @@ public class OrderServiceImpl implements OrderService {
     public void adminRejection(Orders orders) throws Exception {
         Long id = orders.getId();
         Orders order = orderMapper.getBtId(id);
+        if(order == null || !order.getStatus().equals(Orders.TO_BE_CONFIRMED)){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
         if(order.getPayStatus().equals(Orders.PAID)){
             String refund = weChatPayUtil.refund(
                     order.getNumber(),
@@ -339,9 +342,33 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setStatus(Orders.CANCELLED);
         order.setCancelTime(LocalDateTime.now());
-        order.setCancelReason(orders.getCancelReason());
+        order.setRejectionReason(orders.getRejectionReason());
         orderMapper.update(order);
     }
+
+//    /**
+//     * 拒单
+//     * @param orders
+//     * @throws Exception
+//     */
+//    @Override
+//    public void adminRejection(Orders orders) throws Exception {
+//        Long id = orders.getId();
+//        Orders order = orderMapper.getBtId(id);
+//        if(order.getPayStatus().equals(Orders.PAID)){
+//            String refund = weChatPayUtil.refund(
+//                    order.getNumber(),
+//                    order.getNumber(),
+//                    new BigDecimal(0.01),
+//                    new BigDecimal((0.01)));
+//            log.info("申请退款:{}",refund);
+//            order.setPayStatus(Orders.REFUND);
+//        }
+//        order.setStatus(Orders.CANCELLED);
+//        order.setCancelTime(LocalDateTime.now());
+//        order.setCancelReason(orders.getCancelReason());
+//        orderMapper.update(order);
+//    }
 
 
 }
