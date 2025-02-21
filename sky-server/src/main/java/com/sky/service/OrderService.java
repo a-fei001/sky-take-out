@@ -81,4 +81,10 @@ public interface OrderService {
      * @param orders
      */
     void adminCancel(Orders orders) throws Exception;
+
+    /**
+     * 派送订单
+     * @param id
+     */
+    void adminDelivery(Long id);
 }

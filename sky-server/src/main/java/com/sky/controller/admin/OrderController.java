@@ -96,4 +96,11 @@ public class OrderController {
         orderService.adminCancel(orders);
         return Result.success();
     }
+
+    @PutMapping("/delivery/{id}")
+    @ApiOperation("派送订单")
+    public Result adminDelivery(@PathVariable Long id) {
+        orderService.adminDelivery(id);
+        return Result.success();
+    }
 }
