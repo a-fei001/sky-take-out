@@ -6,6 +6,8 @@ import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface OrderMapper {
 
@@ -37,4 +39,11 @@ public interface OrderMapper {
      */
     @Select("select * from sky_take_out.orders where id = #{id}")
     Orders getBtId(Long id);
+
+    /**
+     * 查询所有订单信息
+     * @return
+     */
+    @Select("select * from sky_take_out.orders")
+    List<Orders> selectAll();
 }

@@ -262,6 +262,36 @@ public class OrderServiceImpl implements OrderService {
         return new PageResult(page.getTotal(),list);
     }
 
+    /**
+     * 各个状态的订单数量统计
+     * @return
+     */
+    @Override
+    public OrderStatisticsVO adminStatistics() {
+        // 查询所有订单
+        List<Orders> list = orderMapper.selectAll();
+        // 初始化统计变量
+        Integer toBeConfirmed = 0;
+        Integer confirmed = 0;
+        Integer deliveryInProgress = 0;
+        // 遍历订单并统计
+        for (Orders order : list) {
+            if (order.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+                toBeConfirmed++;
+            } else if (order.getStatus().equals(Orders.CONFIRMED)) {
+                confirmed++;
+            } else if (order.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)) {
+                deliveryInProgress++;
+            }
+        }
+        // 创建 OrderStatisticsVO 对象并设置统计结果
+        OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
+        orderStatisticsVO.setToBeConfirmed(toBeConfirmed);
+        orderStatisticsVO.setConfirmed(confirmed);
+        orderStatisticsVO.setDeliveryInProgress(deliveryInProgress);
+        return orderStatisticsVO;
+    }
+
 
 }
 
