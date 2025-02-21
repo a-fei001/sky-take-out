@@ -22,11 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -200,6 +203,22 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(newOrder);
     }
 
+    @Override
+    public void repetition(Long id) {
+        //查询订单详细信息
+        List<OrderDetail> orderDetails = orderDetailMapper.getBatchByOrderId(id);
+        //将订单详细信息解析并添加进购物车
+        List<ShoppingCart> list = orderDetails.stream().map(orderDetail -> {
+            //shoppingCart对象必须要创建在map内部
+            //否则生成List<ShoppingCart>数组添加的全是List<OrderDetails>最后一个元素的数据
+            ShoppingCart shoppingCart = new ShoppingCart();
+            BeanUtils.copyProperties(orderDetail, shoppingCart);
+            shoppingCart.setUserId(BaseContext.getCurrentId());
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            return shoppingCart;
+        }).collect(Collectors.toList());
+        shoppingCartMapper.insertBatch(list);
+    }
 
 
 }
