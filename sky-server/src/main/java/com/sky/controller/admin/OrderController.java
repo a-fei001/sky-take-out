@@ -83,4 +83,17 @@ public class OrderController {
         orderService.adminRejection(orders);
         return Result.success();
     }
+
+    /**
+     * 取消订单
+     * @param orders
+     * @return
+     * @throws Exception
+     */
+    @PutMapping("/cancel")
+    @ApiOperation("取消订单")
+    public Result adminCancel(@RequestBody Orders orders) throws Exception {
+        orderService.adminCancel(orders);
+        return Result.success();
+    }
 }

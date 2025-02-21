@@ -346,29 +346,28 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(order);
     }
 
-//    /**
-//     * 拒单
-//     * @param orders
-//     * @throws Exception
-//     */
-//    @Override
-//    public void adminRejection(Orders orders) throws Exception {
-//        Long id = orders.getId();
-//        Orders order = orderMapper.getBtId(id);
-//        if(order.getPayStatus().equals(Orders.PAID)){
-//            String refund = weChatPayUtil.refund(
-//                    order.getNumber(),
-//                    order.getNumber(),
-//                    new BigDecimal(0.01),
-//                    new BigDecimal((0.01)));
-//            log.info("申请退款:{}",refund);
-//            order.setPayStatus(Orders.REFUND);
-//        }
-//        order.setStatus(Orders.CANCELLED);
-//        order.setCancelTime(LocalDateTime.now());
-//        order.setCancelReason(orders.getCancelReason());
-//        orderMapper.update(order);
-//    }
+    /**
+     * 取消订单
+     * @param orders
+     */
+    @Override
+    public void adminCancel(Orders orders) throws Exception {
+        Long id = orders.getId();
+        Orders order = orderMapper.getBtId(id);
+        if(order.getPayStatus().equals(Orders.PAID)){
+            String refund = weChatPayUtil.refund(
+                    order.getNumber(),
+                    order.getNumber(),
+                    new BigDecimal(0.01),
+                    new BigDecimal((0.01)));
+            log.info("申请退款:{}",refund);
+            order.setPayStatus(Orders.REFUND);
+        }
+        order.setStatus(Orders.CANCELLED);
+        order.setCancelTime(LocalDateTime.now());
+        order.setCancelReason(orders.getCancelReason());
+        orderMapper.update(order);
+    }
 
 
 }

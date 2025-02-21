@@ -75,4 +75,10 @@ public interface OrderService {
      * @param orders
      */
     void adminRejection(Orders orders) throws Exception;
+
+    /**
+     * 取消订单
+     * @param orders
+     */
+    void adminCancel(Orders orders) throws Exception;
 }
