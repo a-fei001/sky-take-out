@@ -70,4 +70,17 @@ public class OrderController {
         orderService.adminConfirm(orders);
         return Result.success();
     }
+
+    /**
+     * 拒单
+     * @param orders
+     * @return
+     * @throws Exception
+     */
+    @PutMapping("/rejection")
+    @ApiOperation("拒单")
+    public Result adminRejection(@RequestBody Orders orders) throws Exception {
+        orderService.adminRejection(orders);
+        return Result.success();
+    }
 }

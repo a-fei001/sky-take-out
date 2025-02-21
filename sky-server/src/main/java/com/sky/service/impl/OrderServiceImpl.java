@@ -15,6 +15,8 @@ import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
@@ -171,6 +174,11 @@ public class OrderServiceImpl implements OrderService {
         return new PageResult(orders.getTotal(),list);
     }
 
+    /**
+     * 查询订单详情
+     * @param id
+     * @return
+     */
     @Override
     public OrderVO select(Long id) {
         Orders orders = orderMapper.getBtId(id);
@@ -181,10 +189,15 @@ public class OrderServiceImpl implements OrderService {
         return orderVO;
     }
 
+    /**
+     * 取消订单
+     * @param id
+     * @throws Exception
+     */
     @Override
     public void cancelById(Long id) throws Exception {
         Orders order = orderMapper.getBtId(id);
-        if(order == null){//
+        if(order == null){
             throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
         }
         if(order.getStatus() > 2){
@@ -206,6 +219,10 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(newOrder);
     }
 
+    /**
+     * 再来一单
+     * @param id
+     */
     @Override
     public void repetition(Long id) {
         //查询订单详细信息
@@ -292,10 +309,38 @@ public class OrderServiceImpl implements OrderService {
         return orderStatisticsVO;
     }
 
+    /**
+     * 接单
+     * @param orders
+     */
     @Override
     public void adminConfirm(Orders orders) {
         orders.setStatus(Orders.CONFIRMED);
         orderMapper.update(orders);
+    }
+
+    /**
+     * 取消订单
+     * @param orders
+     * @throws Exception
+     */
+    @Override
+    public void adminRejection(Orders orders) throws Exception {
+        Long id = orders.getId();
+        Orders order = orderMapper.getBtId(id);
+        if(order.getPayStatus().equals(Orders.PAID)){
+            String refund = weChatPayUtil.refund(
+                    order.getNumber(),
+                    order.getNumber(),
+                    new BigDecimal(0.01),
+                    new BigDecimal((0.01)));
+            log.info("申请退款:{}",refund);
+            order.setPayStatus(Orders.REFUND);
+        }
+        order.setStatus(Orders.CANCELLED);
+        order.setCancelTime(LocalDateTime.now());
+        order.setCancelReason(orders.getCancelReason());
+        orderMapper.update(order);
     }
 
 
