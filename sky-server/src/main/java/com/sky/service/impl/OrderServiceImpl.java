@@ -292,6 +292,12 @@ public class OrderServiceImpl implements OrderService {
         return orderStatisticsVO;
     }
 
+    @Override
+    public void adminConfirm(Orders orders) {
+        orders.setStatus(Orders.CONFIRMED);
+        orderMapper.update(orders);
+    }
+
 
 }
 
