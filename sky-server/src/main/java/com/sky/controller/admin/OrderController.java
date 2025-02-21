@@ -97,10 +97,27 @@ public class OrderController {
         return Result.success();
     }
 
+    /**
+     * 派送订单
+     * @param id
+     * @return
+     */
     @PutMapping("/delivery/{id}")
     @ApiOperation("派送订单")
     public Result adminDelivery(@PathVariable Long id) {
         orderService.adminDelivery(id);
+        return Result.success();
+    }
+
+    /**
+     * 完成订单
+     * @param id
+     * @return
+     */
+    @PutMapping("/complete/{id}")
+    @ApiOperation("完成订单")
+    public Result adminComplete(@PathVariable Long id) {
+        orderService.adminComplete(id);
         return Result.success();
     }
 }

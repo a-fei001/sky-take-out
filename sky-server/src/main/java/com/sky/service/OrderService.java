@@ -87,4 +87,10 @@ public interface OrderService {
      * @param id
      */
     void adminDelivery(Long id);
+
+    /**
+     * 完成订单
+     * @param id
+     */
+    void adminComplete(Long id);
 }
