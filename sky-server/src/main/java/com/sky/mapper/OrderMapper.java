@@ -23,5 +23,18 @@ public interface OrderMapper {
      */
     void update(Orders orders);
 
+    /**
+     * 分页查询同一个用户历史订单信息
+     * @param ordersPageQueryDTO
+     * @return
+     */
     Page<Orders> pageQueryOrdersByUserId(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 根据id查询订单信息
+     * @param id
+     * @return
+     */
+    @Select("select * from sky_take_out.orders where id = #{id}")
+    Orders getBtId(Long id);
 }
