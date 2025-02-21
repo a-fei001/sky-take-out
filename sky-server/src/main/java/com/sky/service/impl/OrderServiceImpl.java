@@ -19,6 +19,7 @@ import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -173,6 +174,33 @@ public class OrderServiceImpl implements OrderService {
         orderVO.setOrderDetailList(orderDetails);
         return orderVO;
     }
+
+    @Override
+    public void cancelById(Long id) throws Exception {
+        Orders order = orderMapper.getBtId(id);
+        if(order == null){//
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        if(order.getStatus() > 2){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders newOrder = new Orders();
+        BeanUtils.copyProperties(order, newOrder);
+        if(order.getPayStatus().equals(Orders.TO_BE_CONFIRMED)){
+            weChatPayUtil.refund(
+                    order.getNumber(),
+                    order.getNumber(),
+                    new BigDecimal(0.01),
+                    new BigDecimal((0.01)));
+            newOrder.setPayStatus(Orders.REFUND);
+        }
+        newOrder.setStatus(Orders.CANCELLED);
+        newOrder.setCancelTime(LocalDateTime.now());
+        newOrder.setCancelReason("用户取消");
+        orderMapper.update(newOrder);
+    }
+
+
 
 }
 
