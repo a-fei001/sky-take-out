@@ -76,7 +76,9 @@ public class OrderServiceImpl implements OrderService {
         orders.setPayStatus(Orders.UN_PAID);
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
-        orders.setAddress(addressBook.getDetail());
+        //地址我这里拼接为：省+市+区/县+详细地址
+        orders.setAddress(addressBook.getProvinceName()+addressBook.getCityName()
+                +addressBook.getDistrictName()+addressBook.getDetail());
         orders.setNumber(String.valueOf(System.currentTimeMillis()));
         orderMapper.insert(orders);
         //3.order_detail表的插入操作
