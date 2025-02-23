@@ -143,7 +143,6 @@ public class OrderServiceImpl implements OrderService {
      * @param outTradeNo
      */
     public void paySuccess(String outTradeNo) {
-
         // 根据订单号查询订单
         Orders ordersDB = orderMapper.getByNumber(outTradeNo);
 
@@ -164,7 +163,6 @@ public class OrderServiceImpl implements OrderService {
         map.put("content",outTradeNo);
         String jsonString = JSONObject.toJSONString(map);
         webSocketServer.sendToAllClient(jsonString);
-
     }
 
     /**
@@ -234,14 +232,6 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setCancelTime(LocalDateTime.now());
         newOrder.setCancelReason("用户取消");
         orderMapper.update(newOrder);
-
-        //订单提醒
-        Map map = new HashMap();
-        map.put("type",1);
-        map.put("orderId",order.getId());
-        map.put("content",order.getNumber());
-        String jsonString = JSONObject.toJSONString(map);
-        webSocketServer.sendToAllClient(jsonString);
     }
 
     /**
@@ -426,6 +416,22 @@ public class OrderServiceImpl implements OrderService {
         order1.setStatus(Orders.COMPLETED);
         order1.setDeliveryTime(LocalDateTime.now());
         orderMapper.update(order1);
+    }
+
+
+    @Override
+    public void reminder(Long id) {
+        Orders order = orderMapper.getBtId(id);
+        if(order==null){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //订单提醒
+        Map map = new HashMap();
+        map.put("type",2);
+        map.put("orderId",order.getId());
+        map.put("content",order.getNumber());
+        String jsonString = JSONObject.toJSONString(map);
+        webSocketServer.sendToAllClient(jsonString);
     }
 
 
