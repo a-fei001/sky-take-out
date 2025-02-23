@@ -15,6 +15,7 @@ import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.*;
+import com.sky.webSocket.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -27,9 +28,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -50,6 +54,8 @@ public class OrderServiceImpl implements OrderService {
     private DishMapper dishMapper;
     @Autowired
     private SetmealMapper setmealMapper;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -150,6 +156,15 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        //订单提醒
+        Map map = new HashMap();
+        map.put("type",1);
+        map.put("orderId",orders.getId());
+        map.put("content",outTradeNo);
+        String jsonString = JSONObject.toJSONString(map);
+        webSocketServer.sendToAllClient(jsonString);
+
     }
 
     /**
@@ -219,6 +234,14 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setCancelTime(LocalDateTime.now());
         newOrder.setCancelReason("用户取消");
         orderMapper.update(newOrder);
+
+        //订单提醒
+        Map map = new HashMap();
+        map.put("type",1);
+        map.put("orderId",order.getId());
+        map.put("content",order.getNumber());
+        String jsonString = JSONObject.toJSONString(map);
+        webSocketServer.sendToAllClient(jsonString);
     }
 
     /**
