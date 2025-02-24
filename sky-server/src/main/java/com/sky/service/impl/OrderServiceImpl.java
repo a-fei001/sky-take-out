@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -9,10 +10,12 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
+import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.utils.BaiduUtil;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.*;
 import com.sky.webSocket.WebSocketServer;
@@ -20,17 +23,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.util.UriUtils;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -56,10 +63,14 @@ public class OrderServiceImpl implements OrderService {
     private SetmealMapper setmealMapper;
     @Autowired
     private WebSocketServer webSocketServer;
+    @Value("${sky.shop.address}")
+    private String shopAddress;
+    @Value("${sky.baidu.ak}")
+    private String AK;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public OrderSubmitVO submitOrder(OrdersSubmitDTO ordersSubmitDTO) {
+    public OrderSubmitVO submitOrder(OrdersSubmitDTO ordersSubmitDTO) throws Exception {
         //1.异常判断（虽然前端大概率判断过，但是这里重写一遍来防止绕过前端直接发送的恶意请求）
         //- 地址栏为空
         AddressBook addressBook = addressBookMapper.getById(ordersSubmitDTO.getAddressBookId());
@@ -73,6 +84,11 @@ public class OrderServiceImpl implements OrderService {
         if (list == null || list.isEmpty()) {
             throw new OrderBusinessException(MessageConstant.SHOPPING_CART_IS_NULL);
         }
+        String userAddress = addressBook.getProvinceName()+addressBook.getCityName()
+                +addressBook.getDistrictName()+addressBook.getDetail();
+        //- 用户和商家的距离太远
+        findDistanceException(addressBook,userAddress);
+
         //2.orders表的插入操作
         Orders orders = new Orders();
         BeanUtils.copyProperties(ordersSubmitDTO, orders);
@@ -83,8 +99,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
         //地址我这里拼接为：省+市+区/县+详细地址
-        orders.setAddress(addressBook.getProvinceName()+addressBook.getCityName()
-                +addressBook.getDistrictName()+addressBook.getDetail());
+        orders.setAddress(userAddress);
         orders.setNumber(String.valueOf(System.currentTimeMillis()));
         orderMapper.insert(orders);
         //3.order_detail表的插入操作
@@ -107,6 +122,71 @@ public class OrderServiceImpl implements OrderService {
                 .build();
         return orderSubmitVO;
     }
+
+    /**
+     * 判断商家和用户距离是不是太远
+     * @param addressBook
+     * @param userAddress
+     * @throws Exception
+     */
+    public void findDistanceException(AddressBook addressBook,String userAddress) throws Exception {
+        //- 距离判断-超过50公里无法加入订单
+        String url = "https://api.map.baidu.com/geocoding/v3?";
+        BaiduUtil baiduUtil = new BaiduUtil();
+        //调用地址编码-获取包含shopAddress经纬度信息的json字符串
+        Map params = new LinkedHashMap<String, String>();
+        params.put("address", shopAddress);
+        params.put("output", "json");
+        params.put("ak", AK);
+        String jsonShop = baiduUtil.requestGetAK(url, params);
+        //调用地址编码-获取包含userAddress经纬度信息的json字符串
+        params.put("address", userAddress);
+        String jsonUser = baiduUtil.requestGetAK(url, params);
+        //解析jsonUser
+        JSONObject userJson = JSONObject.parseObject(jsonUser);
+        if(!userJson.getString("status").equals("0")){
+            throw new OrderBusinessException("用户地址解析失败");
+        }
+        JSONObject location = userJson.getJSONObject("result").getJSONObject("location");
+        String userLatLng = location.getString("lat")+","+location.getString("lng");
+        //解析jsonShop
+        JSONObject shopJson = JSONObject.parseObject(jsonShop);
+        if (!shopJson.getString("status").equals("0")) {
+            throw new OrderBusinessException("店铺地址解析失败");
+        }
+        JSONObject shopLocation = shopJson.getJSONObject("result").getJSONObject("location");
+        String shopLatLng = shopLocation.getString("lat") +","+ shopLocation.getString("lng");
+        log.info("商家纬度经度：{}", shopLatLng);
+        log.info("用户纬度经度：{}", userLatLng);
+        //计算用户和餐厅的距离
+        String driveUrl = "https://api.map.baidu.com/directionlite/v1/driving?";
+        Map map = new LinkedHashMap<String,String>();
+        map.put("origin", shopLatLng);
+        map.put("destination", userLatLng);
+        map.put("ak",AK);
+        String jsonDrive = baiduUtil.requestDriveGetAK(driveUrl, map);
+        JSONObject driveJson = JSONObject.parseObject(jsonDrive);
+        if(!driveJson.getString("status").equals("0")){
+            throw new OrderBusinessException("配送路线规划失败");
+        }
+        //从 JSON 对象中提取 result
+        JSONObject result = driveJson.getJSONObject("result");
+        //提取 routes 数组
+        JSONArray routes = result.getJSONArray("routes");
+        //假设我们只需要第一个 route 的距离
+        if (routes.size() > 0) {
+            JSONObject firstRoute = routes.getJSONObject(0);
+            Integer distance = firstRoute.getInteger("distance"); // 使用 getInt 或 parse Integer
+            log.info("距离为：{}",distance);
+            if (distance > 50000) {
+                throw new OrderBusinessException("超出配送范围");
+            }
+        } else {
+            //处理没有 routes 的情况
+            throw new OrderBusinessException("配送路线规划失败");
+        }
+    }
+
 
     /**
      * 订单支付
