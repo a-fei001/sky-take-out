@@ -499,6 +499,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    /**
+     * 用户催单
+     * @param id
+     */
     @Override
     public void reminder(Long id) {
         Orders order = orderMapper.getBtId(id);

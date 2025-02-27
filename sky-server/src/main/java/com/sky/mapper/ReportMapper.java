@@ -2,6 +2,7 @@ package com.sky.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Mapper
@@ -20,6 +21,15 @@ public interface ReportMapper {
      * @return
      */
     Integer getUserCountByCreateTime(Map map);
+
+    /**
+     * 根据时间和状态查找订单数量
+     * @param begin
+     * @param end
+     * @param status
+     * @return
+     */
+    Integer getOrderCount(LocalDateTime begin, LocalDateTime end, Integer status);
 }
 
 
