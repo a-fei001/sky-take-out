@@ -1,8 +1,10 @@
 package com.sky.mapper;
 
+import com.sky.dto.GoodsSalesDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Mapper
@@ -30,6 +32,15 @@ public interface ReportMapper {
      * @return
      */
     Integer getOrderCount(LocalDateTime begin, LocalDateTime end, Integer status);
+
+    /**
+     * 查询一段时间内销量排名top10
+     * @param begin
+     * @param end
+     * @param status
+     * @return
+     */
+    List<GoodsSalesDTO> getSalesTop10(LocalDateTime begin, LocalDateTime end, Integer status);
 }
 
 
